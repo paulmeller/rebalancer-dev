@@ -37,10 +37,25 @@ try:
 except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
+    
+# Create a new dataframe with the proposed portfolio holdings and current values
+df_inital_holdings = INITIAL_HOLDINGS.copy()
+
+current_holdings = []
+for stock in df_inital_holdings.index:
+    ticker = yf.Ticker(stock)
+    price = 1 #proposed_prices[stock]
+    num_shares = 1 #proposed_shares[stock]
+    proposed_holdings.append([stock, price, num_shares, num_shares * price])
+df_current_holdings = pd.DataFrame(proposed_holdings, columns=['Stock', 'Price', 'Shares', 'On Hand'])
+df_current_holdings['Weight'] = df_proposed_holdings['On Hand'] / target_portfolio_value
+df_current_holdings.set_index('Stock')
+    
+
 # Get the current stock prices from Yahoo Finance
 prices = {}
 
-df_inital_holdings = INITIAL_HOLDINGS.copy()
+
 for stock in df_initial_holdings.index:
     ticker = yf.Ticker(stock)
     prices[stock] = ticker.history(period='1d')['Close'][0]
