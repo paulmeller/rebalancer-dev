@@ -33,6 +33,7 @@ if 'target_portfolio' not in st.session_state:
     st.session_state.target_portfolio = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
 
 # Define the initial portfolio weights as a dataframe
+st.write("Proposed Portfolio Weightings:")
 try:
     st.experimental_data_editor(st.session_state.target_portfolio)
 except:
@@ -49,6 +50,7 @@ for stock in df_initial_holdings.index:
 df_initial_holdings['Price'] = df_initial_holdings.index.map(prices)
 df_initial_holdings['On Hand'] = df_initial_holdings['Shares'] * df_initial_holdings['Price']
 
+st.write("Current Portfolio Holdings:")
 initial_holdings = st.experimental_data_editor(df_initial_holdings)
 
 # Get the target portfolio value
