@@ -44,8 +44,8 @@ df_inital_holdings = INITIAL_HOLDINGS.copy()
 current_holdings = []
 for stock in df_inital_holdings.index:
     ticker = yf.Ticker(stock)
-    price = 1 #proposed_prices[stock]
-    num_shares = 1 #proposed_shares[stock]
+    price = ticker.history(period='1d')['Close'][0]
+    num_shares = stock['Shares'] #proposed_shares[stock]
     current_holdings.append([stock, price, num_shares, num_shares * price])
 df_current_holdings = pd.DataFrame(current_holdings, columns=['Stock', 'Price', 'Shares', 'On Hand'])
 df_current_holdings.set_index('Stock')
