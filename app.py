@@ -50,6 +50,7 @@ def plot_allocation(portfolio, prices):
 # Display the table for the user to input initial holdings
 df_current_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
 # df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
+st.write(df_current_holdings)
 df_holdings = df_current_holdings
 
 # Get the current stock prices from Yahoo Finance
