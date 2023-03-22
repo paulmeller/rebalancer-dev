@@ -35,7 +35,7 @@ if 'target_portfolio' not in st.session_state:
 # Define the initial portfolio weights as a dataframe
 st.write("Proposed Portfolio Weightings:")
 try:
-    df_target_portfolio = st.experimental_data_editor(st.session_state.target_portfolio, num_rows=”dynamic”)
+    df_target_portfolio = st.experimental_data_editor(st.session_state.target_portfolio, num_rows="dynamic")
 except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
