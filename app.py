@@ -12,33 +12,34 @@ def calculate_portfolio_value(portfolio, prices):
 # Define the function to rebalance the portfolio
 def rebalance_portfolio(portfolio, target_value):
     prices = {}
-    for stock in portfolio.keys():
+    for stock in portfolio.index:
         ticker = yf.Ticker(stock)
         prices[stock] = ticker.history(period='1d')['Close'][0]
-    total_value = calculate_portfolio_value(portfolio, prices)
+    total_value = calculate_portfolio_value(portfolio.to_dict()['Weight'], prices)
     if total_value > target_value:
-        for stock, weight in portfolio.items():
-            portfolio[stock] = weight * (target_value / total_value)
+        for stock in portfolio.index:
+            portfolio.loc[stock, 'Weight'] *= (target_value / total_value)
     shares = {}
-    for stock, weight in portfolio.items():
-        shares[stock] = int(weight * target_value / prices[stock])
-    return portfolio, shares
+    for stock in portfolio.index:
+        shares[stock] = int(portfolio.loc[stock, 'Weight'] * target_value / prices[stock])
+    return portfolio, shares, prices
 
-# Define the initial portfolio weights
-portfolio = {'GOOG': 0.6, 'MSFT': 0.4}
+# Define the initial portfolio weights as a dataframe
+weights = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
 
 # Rebalance the portfolio to a value of $100,000
-portfolio, shares = rebalance_portfolio(portfolio, 100000)
+portfolio, shares, prices = rebalance_portfolio(weights, 100000)
 
 # Create a new dataframe with the portfolio holdings and current values
 holdings = []
-for stock, weight in portfolio.items():
+for stock in portfolio.index:
+    weight = portfolio.loc[stock, 'Weight']
     ticker = yf.Ticker(stock)
-    price = ticker.history(period='1d')['Close'][0]
+    price = prices[stock]
     value = weight * 100000
     num_shares = shares[stock]
-    holdings.append([stock, weight, price, value, num_shares])
-df_holdings = pd.DataFrame(holdings, columns=['Stock', 'Weight', 'Price', 'Value', 'Shares'])
+    holdings.append([stock, weight, price, value, num_shares, num_shares * price])
+df_holdings = pd.DataFrame(holdings, columns=['Stock', 'Weight', 'Price', 'Value', 'Shares', 'On Hand'])
 
 # Display the portfolio holdings in a table
 st.write(df_holdings)
