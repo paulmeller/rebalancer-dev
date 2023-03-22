@@ -29,11 +29,14 @@ def rebalance_portfolio(portfolio, target_value):
 
 # Define the initial portfolio weights as a dataframe
 df_weights = pd.DataFrame({'Stock': ['GOOG', 'STIP'], 'Weight': [0.6, 0.4]}).set_index('Stock')
+
 # Display the table for the user to input initial holdings
 try:
     target_portfolio = st.experimental_data_editor(df_weights)
 except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
+
+initial_holdings = pd.DataFrame({'ticker': ['GOOG', 'STIP'], 'num_shares': [12, 29]}).set_index('ticker')
 
 # Get the current stock prices from Yahoo Finance
 prices = {}
@@ -43,13 +46,10 @@ for stock in initial_holdings.index:
 # Calculate the current value of the portfolio based on the initial holdings
 initial_holdings['Price'] = initial_holdings.index.map(prices)
 initial_holdings['On Hand'] = initial_holdings['Shares'] * initial_holdings['Price']
-initial_portfolio_value = initial_holdings['On Hand'].sum()
-# Get user input for the target portfolio value
-try:
-    target_portfolio_value = st.number_input('Enter the target value of your portfolio:', value=initial_portfolio_value, step=1000, min_value=0.0, max_value=float("inf"))
-except:
-    st.warning("Unable to display the number input widget. Please input the target portfolio value as a number.")
-    target_portfolio_value = initial_portfolio_value
+
+# Get the target portfolio value
+target_portfolio_value = initial_holdings['On Hand'].sum()
+
 # Rebalance the portfolio to match the target value
 portfolio_weights = df_weights.copy()
 proposed_portfolio, proposed_shares, proposed_prices = rebalance_portfolio(portfolio_weights, target_portfolio_value)
