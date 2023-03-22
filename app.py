@@ -86,8 +86,9 @@ for stock in initial_holdings.index:
     else:
         trade_details.append(f"Sell {initial_shares} shares of {stock}")
 for stock in df_proposed_holdings['Stock'].values:
+    new_shares = df_proposed_holdings.loc[df_proposed_holdings['Stock'] == stock, 'Shares'].values[0]
     if stock not in initial_holdings.index:
-        trade_details.append(f"Buy all shares of {stock}")
+        trade_details.append(f"Buy {new_shares} shares of {stock}")
 
 # Display the trade details
 st.write("Trade Details:")
