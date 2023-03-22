@@ -49,7 +49,8 @@ def plot_allocation(portfolio, prices):
 
 # Display the table for the user to input initial holdings
 df_current_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
-df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
+# df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
+df_holdings = df_current_holdings
 
 # Get the current stock prices from Yahoo Finance
 prices = {}
@@ -63,10 +64,11 @@ df_holdings['Value'] = df_holdings['Price'] * df_holdings['Shares']
 current_portfolio_value = df_holdings['Value'].sum()
 
 # Define the initial portfolio weights as a dataframe
-df_target_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
+df_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
 
 # Ask the user for their target allocation
 # df_target_weights = display_editable_table(df_weights, 'Target Weights')
+df_target_weights = df_weights
 
 # Calculate the target portfolio value
 target_portfolio_value = current_portfolio_value * (df_target_weights['Weight'].sum() / df_weights['Weight'].sum())
