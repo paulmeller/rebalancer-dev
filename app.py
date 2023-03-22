@@ -63,14 +63,12 @@ df_current_holdings = pd.DataFrame(current_holdings, columns=['Stock', 'Price', 
 df_holdings = display_editable_table(df_current_holdings, 'Current Portfolio')
 
 current_portfolio_value = df_holdings['Value'].sum()
-st.write(f"Current value: ${current_portfolio_value:,.2f}")
 
 # Define the initial portfolio weights as a dataframe
 df_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
 
 # Ask the user for their target allocation
 df_target_weights = display_editable_table(df_weights, 'Target Weights')
-# df_target_weights = df_weights
 
 # Calculate the target portfolio value
 target_portfolio_value = current_portfolio_value * (df_target_weights['Weight'].sum() / df_weights['Weight'].sum())
@@ -91,7 +89,8 @@ df_proposed_holdings = pd.DataFrame(proposed_holdings, columns=['Stock', 'Price'
 # Display the current and proposed portfolio allocations
 st.write("### Portfolio Allocation")
 st.write(f"Current value: ${current_portfolio_value:,.2f}")
-plot_allocation(df_holdings['Shares'].to_dict(), prices)
+
+# plot_allocation(df_holdings['Shares'].to_dict(), prices)
 proposed_portfolio_value = df_proposed_holdings['Value'].sum()
 st.write(f"Proposed value: ${proposed_portfolio_value:,.2f}")
 # plot_allocation(df_proposed_holdings['Shares'].to_dict(), proposed_prices)
