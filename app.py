@@ -11,7 +11,6 @@ def calculate_portfolio_value(portfolio, prices):
     return total_value
 
 # Define the function to rebalance the portfolio
-@st.cache_data
 def rebalance_portfolio(portfolio, target_value):
     prices = {}
     for stock in portfolio.index:
@@ -49,6 +48,7 @@ def plot_allocation(portfolio, prices):
 
 # Display the table for the user to input initial holdings
 current_portfolio = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
+
 current_holdings = []
 for stock in current_portfolio.index:
     # Get the current stock prices from Yahoo Finance
@@ -68,11 +68,11 @@ df_holdings = display_editable_table(df_current_holdings, 'Current Portfolio')
 # st.write(f"Current value: ${current_portfolio_value:,.2f}")
 
 # Define the initial portfolio weights as a dataframe
-df_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
+# df_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
 
 # Ask the user for their target allocation
 # df_target_weights = display_editable_table(df_weights, 'Target Weights')
-df_target_weights = df_weights
+# df_target_weights = df_weights
 
 """
 # Calculate the target portfolio value
