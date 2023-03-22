@@ -35,12 +35,8 @@ def rebalance_portfolio(portfolio, target_value):
 # Define a function to display an editable table
 def display_editable_table(df, title):
     st.write(f"### {title}")
-    table = st.table(df)
-    """
-    if table.add_rows or table.add_columns or table.delete_rows or table.delete_columns:
-        df = pd.DataFrame(table.data, columns=table.columns)
-    """
-    return df
+    edited_df = st.experimental_data_editor(df)
+    return edited_df
 
 # Define a function to plot the portfolio allocation
 def plot_allocation(portfolio, prices):
