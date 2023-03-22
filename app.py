@@ -37,7 +37,6 @@ except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
 df_initial_holdings = pd.DataFrame({'ticker': ['GOOG', 'STIP'], 'Shares': [12, 29]}).set_index('ticker')
-initial_holdings = st.experimental_data_editor(df_initial_holdings)
 
 # Get the current stock prices from Yahoo Finance
 prices = {}
@@ -45,8 +44,11 @@ for stock in initial_holdings.index:
     ticker = yf.Ticker(stock)
     prices[stock] = ticker.history(period='1d')['Close'][0]
 # Calculate the current value of the portfolio based on the initial holdings
-initial_holdings['Price'] = initial_holdings.index.map(prices)
-initial_holdings['On Hand'] = initial_holdings['Shares'] * initial_holdings['Price']
+df_initial_holdings['Price'] = initial_holdings.index.map(prices)
+df_initial_holdings['On Hand'] = initial_holdings['Shares'] * initial_holdings['Price']
+
+initial_holdings = st.experimental_data_editor(df_initial_holdings)
+
 
 # Get the target portfolio value
 target_portfolio_value = initial_holdings['On Hand'].sum()
