@@ -44,7 +44,7 @@ def display_editable_table(df, title):
 # Define a function to plot the portfolio allocation
 def plot_allocation(portfolio, prices):
     portfolio_values = {stock: prices[stock] * weight for stock, weight in portfolio.items()}
-    fig = px.pie(names=list(portfolio.keys()), values=list(values.values()))
+    fig = px.pie(names=list(portfolio.keys()), values=list(portfolio_values.values()))
     st.plotly_chart(fig)
 
 # Display the table for the user to input initial holdings
