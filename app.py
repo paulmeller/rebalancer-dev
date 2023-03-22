@@ -1,51 +1,65 @@
 import streamlit as st
-import yfinance as yf
 import pandas as pd
 import numpy as np
-import plotly.express as px
 
+def rebalance_portfolio(initial_weights, current_prices, target_weights, total_value):
+    # Convert initial and target weights to numpy arrays
+    initial_weights = np.array(initial_weights)
+    target_weights = np.array(target_weights)
 
-st.set_page_config(page_title='Portfolio Rebalancing Tool')
+    # Calculate the current value of each asset in the portfolio
+    current_values = current_prices * (total_value * initial_weights)
 
-st.title('Portfolio Rebalancing Tool')
-st.write('Enter a list of stock tickers and their corresponding weightings, and select the rebalancing frequency.')
+    # Calculate the target value of each asset in the portfolio
+    target_values = total_value * target_weights
 
-@st.cache_data
-def get_data(ticker, start_date, end_date):
-    df = yf.download(ticker, start_date, end_date)
-    df['Ticker'] = ticker
-    return df.reset_index().set_index(['Ticker', 'Date'])
+    # Calculate the difference between the current and target values for each asset
+    value_diffs = target_values - current_values
 
-def get_allocations(tickers_list, weights_list):
-    num_tickers = len(tickers_list)
-    allocations = pd.DataFrame({'Ticker': tickers_list, 'Weight': weights_list})
-    allocations['Allocation'] = allocations['Weight'] / allocations['Weight'].sum()
-    return allocations.set_index('Ticker')
+    # Calculate the number of shares to buy or sell for each asset
+    share_diffs = value_diffs / current_prices
 
-st.sidebar.set_option('deprecation.showPyplotGlobalUse', False)
+    # Round the share differences to the nearest whole number
+    share_diffs = np.round(share_diffs)
 
-tickers_weights = st.sidebar.text_input('Enter comma-separated list of stock tickers and their corresponding weightings (e.g. AAPL:0.5,GOOG:0.3,MSFT:0.2):')
-if st.sidebar.button('Submit'):
-    tickers_weights_list = [tw.split(':') for tw in tickers_weights.upper().split(',') if tw.strip()]
-    tickers_list = [tw[0] for tw in tickers_weights_list]
-    weights_list = [float(tw[1]) for tw in tickers_weights_list]
-    st.write('Tickers:', tickers_list)
-    st.write('Weights:', weights_list)
+    # Calculate the final weights of each asset in the portfolio
+    final_values = current_values + (share_diffs * current_prices)
+    final_weights = final_values / (total_value)
 
-    start_date = '2020-01-01'
-    end_date = '2023-03-22'
+    return final_weights
 
-    data = pd.concat([get_data(t, start_date, end_date) for t in tickers_list], axis=0)
-    st.write('Data:', data)
+# Set the title and page layout
+st.set_page_config(page_title='Portfolio Rebalancer', page_icon=':moneybag:')
 
-    # Sidebar
-    st.sidebar.subheader('Rebalancing Settings')
+# Define the sidebar
+st.sidebar.title('Portfolio Rebalancer')
 
-    # Rebalancing Frequency
-    rebalance_freq = st.sidebar.selectbox('Rebalancing Frequency', ['Monthly', 'Quarterly', 'Yearly'])
+# Get user input for the current prices of each asset in the portfolio
+st.sidebar.subheader('Current Prices')
+prices = {}
+for asset in initial_weights.keys():
+    prices[asset] = st.sidebar.number_input(f'{asset} Price', min_value=0.0)
 
-    if sum(weights_list) != 1.0:
-        st.error('Invalid weights input. Please enter a comma-separated list of weightings that add up to 1.0.')
-    else:
-        allocations = get_allocations(tickers_list, weights_list)
-        st.write('Allocations:', allocations)
+# Get user input for the initial weights of each asset in the portfolio
+st.sidebar.subheader('Initial Weights')
+initial_weights = {}
+for asset in prices.keys():
+    initial_weights[asset] = st.sidebar.number_input(f'{asset} Weight', min_value=0.0, max_value=1.0, value=0.0, step=0.01)
+
+# Get user input for the target weights of each asset in the portfolio
+st.sidebar.subheader('Target Weights')
+target_weights = {}
+for asset in prices.keys():
+    target_weights[asset] = st.sidebar.number_input(f'{asset} Weight', min_value=0.0, max_value=1.0, value=0.0, step=0.01)
+
+# Get user input for the total value of the portfolio
+st.sidebar.subheader('Total Portfolio Value')
+total_value = st.sidebar.number_input('Total Value', min_value=0.0)
+
+# Call the rebalance_portfolio function to get the final weights
+final_weights = rebalance_portfolio(initial_weights, prices, target_weights, total_value)
+
+# Display the final weights to the user
+st.subheader('Final Weights')
+weights_df = pd.DataFrame(final_weights, index=prices.keys(), columns=['Weight'])
+st.write(weights_df)
