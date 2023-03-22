@@ -34,7 +34,7 @@ if 'target_portfolio' not in st.session_state:
 
 # Define the initial portfolio weights as a dataframe
 st.text_area('Portfolio:', key='target_portfolio')
-df_weights = pd.DataFrame(weights).set_index('Stock')
+df_weights = pd.DataFrame(st.session_state.target_portfolio).set_index('Stock')
     
 try:
     st.experimental_data_editor(df_weights)
