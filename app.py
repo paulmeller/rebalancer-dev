@@ -53,7 +53,7 @@ current_holdings = []
 for stock in current_portfolio.index:
     price = 1 # proposed_prices[stock]
     num_shares = 1 # proposed_shares[stock]
-    proposed_holdings.append([stock, price, num_shares, num_shares * price, proposed_portfolio.loc[stock, 'Shares']])
+    current_holdings.append([stock, price, num_shares, num_shares * price, current_portfolio.loc[stock, 'Shares']])
 
 
 df_current_portfolio = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
