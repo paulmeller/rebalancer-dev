@@ -64,8 +64,9 @@ for stock in proposed_portfolio.index:
     price = proposed_prices[stock]
     num_shares = proposed_shares[stock]
     proposed_holdings.append([stock, price, num_shares, num_shares * price])
-df_proposed_holdings = pd.DataFrame(proposed_holdings, columns=['Stock', 'Price', 'Shares', 'On Hand']).set_index('Stock')
+df_proposed_holdings = pd.DataFrame(proposed_holdings, columns=['Stock', 'Price', 'Shares', 'On Hand'])
 df_proposed_holdings['Weight'] = df_proposed_holdings['On Hand'] / target_portfolio_value
+df_proposed_holdings.set_index('Stock')
 
 # Display the proposed portfolio holdings in a table
 st.write("Proposed Portfolio Holdings:")
