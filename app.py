@@ -66,14 +66,14 @@ df_holdings = display_editable_table(df_current_holdings, 'Current Portfolio')
 # df_holdings['Price'] = df_holdings.index.map(prices)
 # df_holdings['Value'] = df_holdings['Price'] * df_holdings['Shares']
 
-# current_portfolio_value = df_holdings['Value'].sum()
-# st.write(f"Current value: ${current_portfolio_value:,.2f}")
+current_portfolio_value = df_holdings['Value'].sum()
+st.write(f"Current value: ${current_portfolio_value:,.2f}")
 
 # Define the initial portfolio weights as a dataframe
-# df_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
+df_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
 
 # Ask the user for their target allocation
-# df_target_weights = display_editable_table(df_weights, 'Target Weights')
+df_target_weights = display_editable_table(df_weights, 'Target Weights')
 # df_target_weights = df_weights
 
 """
