@@ -35,10 +35,11 @@ if 'target_portfolio' not in st.session_state:
 # Define the initial portfolio weights as a dataframe
 st.write("Proposed Portfolio Weightings:")
 try:
-    st.experimental_data_editor(st.session_state.target_portfolio)
+    st.experimental_data_editor(st.session_state.target_portfolio, num_rows=”dynamic”)
 except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
+df_target_portfolio = st.session_state.target_portfolio
 df_initial_holdings = pd.DataFrame({'ticker': ['GOOG', 'STIP'], 'Shares': [120, 29]}).set_index('ticker')
 
 # Get the current stock prices from Yahoo Finance
@@ -57,7 +58,7 @@ initial_holdings = st.experimental_data_editor(df_initial_holdings)
 target_portfolio_value = initial_holdings['On Hand'].sum()
 
 # Rebalance the portfolio to match the target value
-portfolio_weights = st.session_state.target_portfolio.copy()
+portfolio_weights = df_target_portfolio.copy()
 proposed_portfolio, proposed_shares, proposed_prices = rebalance_portfolio(portfolio_weights, target_portfolio_value)
 
 # Create a new dataframe with the proposed portfolio holdings and current values
