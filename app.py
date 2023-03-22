@@ -47,9 +47,6 @@ def plot_allocation(portfolio, prices):
     fig = px.pie(names=list(portfolio.keys()), values=list(values.values()))
     st.plotly_chart(fig)
 
-# Define the initial portfolio weights as a dataframe
-df_weights = pd.DataFrame({'Stock': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Stock')
-
 # Display the table for the user to input initial holdings
 df_current_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
 df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
@@ -65,8 +62,11 @@ df_holdings['Price'] = df_holdings.index.map(prices)
 df_holdings['Value'] = df_holdings['Price'] * df_holdings['Shares']
 current_portfolio_value = df_holdings['Value'].sum()
 
+# Define the initial portfolio weights as a dataframe
+df_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
+
 # Ask the user for their target allocation
-df_target_weights = display_editable_table(df_weights.copy(), 'Target Weights')
+df_target_weights = display_editable_table(df_weights, 'Target Weights')
 
 # Calculate the target portfolio value
 target_portfolio_value = current_portfolio_value * (df_target_weights['Weight'].sum() / df_weights['Weight'].sum())
