@@ -36,7 +36,6 @@ for stock in portfolio.index:
     weight = portfolio.loc[stock, 'Weight']
     ticker = yf.Ticker(stock)
     price = prices[stock]
-    value = weight * 100000
     num_shares = shares[stock]
     holdings.append([stock, weight, price, value, num_shares, num_shares * price])
 df_holdings = pd.DataFrame(holdings, columns=['Stock', 'Weight', 'Price', 'Value', 'Shares', 'On Hand'])
