@@ -37,7 +37,7 @@ except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
 df_initial_holdings = pd.DataFrame({'ticker': ['GOOG', 'STIP'], 'Shares': [12, 29]}).set_index('ticker')
-st.experimental_data_editor(df_initial_holdings)
+initial_holdings = st.experimental_data_editor(df_initial_holdings)
 
 # Get the current stock prices from Yahoo Finance
 prices = {}
