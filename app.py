@@ -27,8 +27,11 @@ def rebalance_portfolio(portfolio, target_value):
 # Define the initial portfolio weights as a dataframe
 weights = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
 
-# Rebalance the portfolio to a value of $100,000
-portfolio, shares, prices = rebalance_portfolio(weights, 100000)
+# Get user input for portfolio value
+portfolio_value = st.number_input('Enter the value of your portfolio:', value=100000, step=1000)
+
+# Rebalance the portfolio to the user-defined value
+portfolio, shares, prices = rebalance_portfolio(weights, portfolio_value)
 
 # Create a new dataframe with the portfolio holdings and current values
 holdings = []
