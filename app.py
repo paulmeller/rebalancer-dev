@@ -54,7 +54,7 @@ df_current_holdings.set_index('Stock')
 # Get the current stock prices from Yahoo Finance
 prices = {}
 
-
+"""
 for stock in df_initial_holdings.index:
     ticker = yf.Ticker(stock)
     prices[stock] = ticker.history(period='1d')['Close'][0]
@@ -62,8 +62,9 @@ for stock in df_initial_holdings.index:
 # Calculate the current value of the portfolio based on the initial holdings
 df_initial_holdings['Price'] = df_initial_holdings.index.map(prices)
 df_initial_holdings['On Hand'] = df_initial_holdings['Shares'] * df_initial_holdings['Price']
+"""
 
-initial_holdings = st.experimental_data_editor(df_initial_holdings)
+initial_holdings = st.experimental_data_editor(df_current_holdings)
 
 # Get the target portfolio value
 target_portfolio_value = initial_holdings['On Hand'].sum()
