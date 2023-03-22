@@ -10,6 +10,7 @@ def calculate_portfolio_value(portfolio, prices):
     return total_value
 
 # Define the function to rebalance the portfolio
+@st.cache_data
 def rebalance_portfolio(portfolio, target_value):
     prices = {}
     for stock in portfolio.index:
