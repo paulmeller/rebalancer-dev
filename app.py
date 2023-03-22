@@ -70,7 +70,7 @@ df_proposed_holdings.set_index('Stock')
 
 # Display the proposed portfolio holdings in a table
 st.write("Proposed Portfolio Holdings:")
-st.experimental_data_editor(df_proposed_holdings)
+st.write(df_proposed_holdings)
 
 # Compare the initial holdings with the proposed holdings to get the trade details
 trade_details = []
