@@ -9,7 +9,7 @@ st.set_page_config(page_title='Portfolio Rebalancing Tool')
 st.title('Portfolio Rebalancing Tool')
 st.write('Enter a list of stock tickers and select the rebalancing frequency and allocation.')
 
-@st.experimental_memoization
+@st.cache_data
 def get_data(ticker, start_date, end_date):
     df = yf.download(ticker, start_date, end_date)
     df['Ticker'] = ticker
