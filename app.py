@@ -55,14 +55,14 @@ for stock in current_portfolio.index:
     ticker = yf.Ticker(stock)
     price = ticker.history(period='1d')['Close'][0]
     num_shares = current_portfolio.loc[stock, 'Shares']
-    current_holdings.append([stock, price, num_shares, num_shares * price, current_portfolio.loc[stock, 'Shares']])
-df_current_holdings = pd.DataFrame(current_holdings, columns=['Stock', 'Price', 'Shares', 'Value', 'Number of Shares'])
+    current_holdings.append([stock, price, num_shares, num_shares * price])
+df_current_holdings = pd.DataFrame(current_holdings, columns=['Stock', 'Price', 'Shares', 'Value'])
 
 df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
 
 # Calculate the current value of the portfolio based on the initial holdings
-df_holdings['Price'] = df_holdings.index.map(prices)
-df_holdings['Value'] = df_holdings['Price'] * df_holdings['Shares']
+# df_holdings['Price'] = df_holdings.index.map(prices)
+# df_holdings['Value'] = df_holdings['Price'] * df_holdings['Shares']
 current_portfolio_value = df_holdings['Value'].sum()
 
 # Define the initial portfolio weights as a dataframe
