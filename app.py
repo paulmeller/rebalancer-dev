@@ -33,7 +33,7 @@ if 'target_portfolio' not in st.session_state:
     st.session_state.target_portfolio = {'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}
 
 # Define the initial portfolio weights as a dataframe
-st.text_area('Portfolio:', key='target_portfolio')
+st.write(st.session_state.target_portfolio)
 df_weights = pd.DataFrame(st.session_state.target_portfolio).set_index('Stock')
     
 try:
