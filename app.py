@@ -32,8 +32,10 @@ def rebalance_portfolio(portfolio, target_value):
 df_weights = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
 
 # Display the table for the user to input initial holdings
+if 'target_portfolio' not in st.session_state:
+    tes = 1
 try:
-    target_portfolio = st.experimental_data_editor(df_weights)
+    st.experimental_data_editor(key='target_portfolio', value=df_weights)
 except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
