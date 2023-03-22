@@ -51,11 +51,8 @@ def plot_allocation(portfolio, prices):
 df_weights = pd.DataFrame({'Stock': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Stock')
 
 # Display the table for the user to input initial holdings
-df_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
-try:
-    df_holdings = display_editable_table(df_holdings, 'Target Portfolio')
-except:
-    st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Ticker' and 'Shares'.")
+df_current_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
+df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
 
 # Get the current stock prices from Yahoo Finance
 prices = {}
