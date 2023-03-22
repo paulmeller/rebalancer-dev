@@ -46,6 +46,7 @@ def plot_allocation(portfolio, prices):
     # portfolio_values = {stock: (prices[stock] * (weight for stock, weight in portfolio.items()))}
     # fig = px.pie(names=list(portfolio.keys()), values=list(portfolio_values.values()))
     # st.plotly_chart(fig)
+    test = 1
 
 # Display the table for the user to input initial holdings
 df_current_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
