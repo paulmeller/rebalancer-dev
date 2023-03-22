@@ -2,6 +2,10 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 
+# Define the initial portfolio weights as a dataframe
+INITIAL_WEIGHTS = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
+INITIAL_HOLDINGS = pd.DataFrame({'ticker': ['GOOG', 'STIP'], 'Shares': [120, 29]}).set_index('ticker')
+
 # Define the function to calculate the portfolio value
 def calculate_portfolio_value(portfolio, prices):
     total_value = 0
@@ -10,7 +14,6 @@ def calculate_portfolio_value(portfolio, prices):
     return total_value
 
 # Define the function to rebalance the portfolio
-@st.cache_data
 def rebalance_portfolio(portfolio, target_value):
     prices = {}
     for stock in portfolio.index:
@@ -28,19 +31,15 @@ def rebalance_portfolio(portfolio, target_value):
         shares[stock] = int(portfolio.loc[stock, 'Weight'] * target_value / prices[stock])
     return portfolio, shares, prices
 
-# Define the initial portfolio weights as a dataframe
-df_weights = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
-
 # Display the table for the user to input initial holdings
 try:
-    target_portfolio = st.experimental_data_editor(df_weights, num_rows="dynamic")
+    target_portfolio = st.experimental_data_editor(INITIAL_WEIGHTS, num_rows="dynamic")
 except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
-df_initial_holdings = pd.DataFrame({'ticker': ['GOOG', 'STIP'], 'Shares': [120, 29]}).set_index('ticker')
-
 # Get the current stock prices from Yahoo Finance
 prices = {}
+df_inital_holdings = INITIAL_HOLDINGS
 for stock in df_initial_holdings.index:
     ticker = yf.Ticker(stock)
     prices[stock] = ticker.history(period='1d')['Close'][0]
