@@ -33,16 +33,18 @@ def rebalance_portfolio(portfolio, target_value):
 
 # Display the table for the user to input initial holdings
 try:
-    target_portfolio = st.experimental_data_editor(INITIAL_WEIGHTS, num_rows="dynamic")
+    target_portfolio = st.experimental_data_editor(INITIAL_WEIGHTS.copy(), num_rows="dynamic")
 except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
 # Get the current stock prices from Yahoo Finance
 prices = {}
-df_inital_holdings = INITIAL_HOLDINGS
+
+df_inital_holdings = INITIAL_HOLDINGS.copy()
 for stock in df_initial_holdings.index:
     ticker = yf.Ticker(stock)
     prices[stock] = ticker.history(period='1d')['Close'][0]
+    
 # Calculate the current value of the portfolio based on the initial holdings
 df_initial_holdings['Price'] = df_initial_holdings.index.map(prices)
 df_initial_holdings['On Hand'] = df_initial_holdings['Shares'] * df_initial_holdings['Price']
