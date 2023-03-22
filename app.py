@@ -16,8 +16,9 @@ def rebalance_portfolio(portfolio):
         ticker = yf.Ticker(stock)
         prices[stock] = ticker.history(period='1d')['Close'][0]
     total_value = calculate_portfolio_value(portfolio, prices)
-    for stock, weight in portfolio.items():
-        portfolio[stock] = weight * (100000 / total_value)
+    if total_value > 100000:
+        for stock, weight in portfolio.items():
+            portfolio[stock] = weight * (100000 / total_value)
     return portfolio
 
 # Define the initial portfolio weights
