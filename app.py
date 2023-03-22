@@ -11,6 +11,7 @@ def calculate_portfolio_value(portfolio, prices):
     return total_value
 
 # Define the function to rebalance the portfolio
+@st.cache_data
 def rebalance_portfolio(portfolio, target_value):
     prices = {}
     for stock in portfolio.index:
@@ -35,36 +36,40 @@ def rebalance_portfolio(portfolio, target_value):
 # Define a function to display an editable table
 def display_editable_table(df, title):
     st.write(f"### {title}")
-    edited_df = st.experimental_data_editor(df)
-    return edited_df
+    table = st.table(df)
+    if table.add_rows or table.add_columns or table.delete_rows or table.delete_columns:
+        df = pd.DataFrame(table.data, columns=table.columns)
+    return df
 
 # Define a function to plot the portfolio allocation
 def plot_allocation(portfolio, prices):
     portfolio_values = {stock: prices[stock] * weight for stock, weight in portfolio.items()}
-    fig = px.pie(names=list(portfolio.keys()), values=list(portfolio_values.values()))
+    fig = px.pie(names=list(portfolio.keys()), values=list(values.values()))
     st.plotly_chart(fig)
 
+# Define the initial portfolio weights as a dataframe
+df_weights = pd.DataFrame({'Stock': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Stock')
+
 # Display the table for the user to input initial holdings
-current_portfolio = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
+df_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
+try:
+    df_holdings = display_editable_table(df_holdings)
+except:
+    st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Ticker' and 'Shares'.")
 
-current_holdings = []
-for stock in current_portfolio.index:
-    # Get the current stock prices from Yahoo Finance
+# Get the current stock prices from Yahoo Finance
+prices = {}
+for stock in df_holdings.index:
     ticker = yf.Ticker(stock)
-    price = ticker.history(period='1d')['Close'][0]
-    num_shares = current_portfolio.loc[stock, 'Shares']
-    current_holdings.append([stock, price, num_shares, num_shares * price])
-df_current_holdings = pd.DataFrame(current_holdings, columns=['Stock', 'Price', 'Shares', 'Value'])
+    prices[stock] = ticker.history(period='1d')['Close'][0]
 
-df_holdings = display_editable_table(df_current_holdings, 'Current Portfolio')
-
+# Calculate the current value of the portfolio based on the initial holdings
+df_holdings['Price'] = df_holdings.index.map(prices)
+df_holdings['Value'] = df_holdings['Price'] * df_holdings['Shares']
 current_portfolio_value = df_holdings['Value'].sum()
 
-# Define the initial portfolio weights as a dataframe
-df_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
-
 # Ask the user for their target allocation
-df_target_weights = display_editable_table(df_weights, 'Target Weights')
+df_target_weights = display_editable_table(df_weights.copy(), 'Target Weights')
 
 # Calculate the target portfolio value
 target_portfolio_value = current_portfolio_value * (df_target_weights['Weight'].sum() / df_weights['Weight'].sum())
@@ -85,14 +90,14 @@ df_proposed_holdings = pd.DataFrame(proposed_holdings, columns=['Stock', 'Price'
 # Display the current and proposed portfolio allocations
 st.write("### Portfolio Allocation")
 st.write(f"Current value: ${current_portfolio_value:,.2f}")
-
-# plot_allocation(df_holdings['Shares'].to_dict(), prices)
+plot_allocation(df_holdings['Shares'].to_dict(), prices)
 proposed_portfolio_value = df_proposed_holdings['Value'].sum()
 st.write(f"Proposed value: ${proposed_portfolio_value:,.2f}")
-# plot_allocation(df_proposed_holdings['Shares'].to_dict(), proposed_prices)
+plot_allocation(df_proposed_holdings['Shares'].to_dict(), proposed_prices)
 
 # Display the proposed portfolio holdings in a table
-df_proposed_holdings = display_editable_table(df_proposed_holdings, 'Proposed Portfolio Holdings')
+st.write("### Proposed Portfolio Holdings")
+st.write(df_proposed_holdings)
 
 # Compare the initial holdings with the proposed holdings to get the trade details
 trade_details = []
