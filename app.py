@@ -26,6 +26,7 @@ def rebalance_portfolio(portfolio, target_value):
 
 # Define the initial portfolio weights as a dataframe
 df = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
+st.experimental_data_editor(df)
 
 # Define the initial portfolio holdings as a dataframe
 holdings_df = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Shares': [40, 64]}).set_index('Stock')
