@@ -35,7 +35,7 @@ for stock in holdings_df.index:
     prices[stock] = ticker.history(period='1d')['Close'][0]
 holdings_df['Price'] = holdings_df.index.map(prices)
 holdings_df['On Hand'] = holdings_df['Shares'] * holdings_df['Price']
-# portfolio_value = holdings_df['On Hand'].sum()
+st.write(holdings_df['On Hand'].sum())
 
 # Get user input for portfolio value
 portfolio_value = 100000 # st.number_input('Enter the value of your portfolio:', value=100000, step=1000, min_value=0.0, max_value=float("inf"))
