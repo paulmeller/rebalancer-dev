@@ -54,12 +54,12 @@ for stock in current_portfolio.index:
     price = 1 # proposed_prices[stock]
     num_shares = 1 # proposed_shares[stock]
     current_holdings.append([stock, price, num_shares, num_shares * price, current_portfolio.loc[stock, 'Shares']])
-df_current_holdings = pd.DataFrame(current_holdings, columns=['Stock', 'Price', 'Shares', 'Value', 'Shares'])
+df_current_holdings = pd.DataFrame(current_holdings, columns=['Stock', 'Price', 'Shares', 'Value', 'Number of Shares'])
 
 df_current_portfolio = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
 
 # df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
-# df_holdings = 
+df_holdings = df_current_holdings
 st.write(df_current_holdings)
 
 # Get the current stock prices from Yahoo Finance
