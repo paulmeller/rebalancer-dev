@@ -33,7 +33,7 @@ df_weights = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set
 
 # Display the table for the user to input initial holdings
 try:
-    target_portfolio = st.experimental_data_editor(df_weights)
+    target_portfolio = st.experimental_data_editor(df_weights, num_rows="dynamic")
 except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
