@@ -97,7 +97,7 @@ st.write(f"Proposed value: ${proposed_portfolio_value:,.2f}")
 
 # Display the proposed portfolio holdings in a table
 st.write("### Proposed Portfolio Holdings")
-st.write(df_proposed_holdings)
+df_proposed_holdings = display_editable_table(df_proposed_holdings, 'Current Portfolio')
 
 # Compare the initial holdings with the proposed holdings to get the trade details
 trade_details = []
