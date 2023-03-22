@@ -28,14 +28,12 @@ def rebalance_portfolio(portfolio, target_value):
         shares[stock] = int(portfolio.loc[stock, 'Weight'] * target_value / prices[stock])
     return portfolio, shares, prices
 
-# Display the table for the user to input initial holdings
-if 'target_portfolio' not in st.session_state:
-    st.session_state.target_portfolio = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
-
 # Define the initial portfolio weights as a dataframe
-st.write("Proposed Portfolio Weightings:")
+df_weights = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
+
+# Display the table for the user to input initial holdings
 try:
-    df_target_portfolio = st.experimental_data_editor(st.session_state.target_portfolio, num_rows="dynamic")
+    target_portfolio = st.experimental_data_editor(df_weights)
 except:
     st.warning("Unable to display the data editor. Please input your holdings as a CSV file with columns 'Stock' and 'Shares'.")
 
@@ -50,14 +48,14 @@ for stock in df_initial_holdings.index:
 df_initial_holdings['Price'] = df_initial_holdings.index.map(prices)
 df_initial_holdings['On Hand'] = df_initial_holdings['Shares'] * df_initial_holdings['Price']
 
-st.write("Current Portfolio Holdings:")
 initial_holdings = st.experimental_data_editor(df_initial_holdings)
+
 
 # Get the target portfolio value
 target_portfolio_value = initial_holdings['On Hand'].sum()
 
 # Rebalance the portfolio to match the target value
-portfolio_weights = df_target_portfolio.copy()
+portfolio_weights = df_weights.copy()
 proposed_portfolio, proposed_shares, proposed_prices = rebalance_portfolio(portfolio_weights, target_portfolio_value)
 
 # Create a new dataframe with the proposed portfolio holdings and current values
@@ -77,8 +75,8 @@ st.write(df_proposed_holdings)
 # Compare the initial holdings with the proposed holdings to get the trade details
 trade_details = []
 for stock in initial_holdings.index:
+    initial_shares = initial_holdings.loc[stock, 'Shares']
     if stock in df_proposed_holdings['Stock'].values:
-        initial_shares = initial_holdings.loc[stock, 'Shares']
         new_shares = df_proposed_holdings.loc[df_proposed_holdings['Stock'] == stock, 'Shares'].values[0]
         trade_shares = new_shares - initial_shares
         if trade_shares > 0:
@@ -86,7 +84,7 @@ for stock in initial_holdings.index:
         elif trade_shares < 0:
             trade_details.append(f"Sell {-trade_shares} shares of {stock}")
     else:
-        trade_details.append(f"Sell all shares of {stock}")
+        trade_details.append(f"Sell {initial_shares} shares of {stock}")
 for stock in df_proposed_holdings['Stock'].values:
     if stock not in initial_holdings.index:
         trade_details.append(f"Buy all shares of {stock}")
