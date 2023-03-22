@@ -33,9 +33,6 @@ if 'target_portfolio' not in st.session_state:
     st.session_state.target_portfolio = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
 
 # Define the initial portfolio weights as a dataframe
-st.write(st.session_state.target_portfolio)
-df_weights = st.session_state.target_portfolio
-    
 try:
     st.experimental_data_editor(st.session_state.target_portfolio)
 except:
@@ -58,7 +55,7 @@ initial_holdings = st.experimental_data_editor(df_initial_holdings)
 target_portfolio_value = initial_holdings['On Hand'].sum()
 
 # Rebalance the portfolio to match the target value
-portfolio_weights = df_weights.copy()
+portfolio_weights = st.session_state.target_portfolio.copy()
 proposed_portfolio, proposed_shares, proposed_prices = rebalance_portfolio(portfolio_weights, target_portfolio_value)
 
 # Create a new dataframe with the proposed portfolio holdings and current values
