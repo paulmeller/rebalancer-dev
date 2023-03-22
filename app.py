@@ -28,14 +28,14 @@ def rebalance_portfolio(portfolio, target_value):
 df = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
 
 # Define the initial portfolio holdings as a dataframe
-holdings_df = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Shares': [47, 18]}).set_index('Stock')
+holdings_df = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Shares': [40, 64]}).set_index('Stock')
 prices = {}
 for stock in holdings_df.index:
     ticker = yf.Ticker(stock)
     prices[stock] = ticker.history(period='1d')['Close'][0]
 holdings_df['Price'] = holdings_df.index.map(prices)
 holdings_df['On Hand'] = holdings_df['Shares'] * holdings_df['Price']
-st.write(holdings_df['On Hand'].sum())
+st.write(holdings_df)
 portfolio_value = holdings_df['On Hand'].sum()
 
 # Get user input for portfolio value
