@@ -40,8 +40,10 @@ for stock in portfolio.index:
     ticker = yf.Ticker(stock)
     price = prices[stock]
     num_shares = shares[stock]
-    holdings.append([stock, price, num_shares, num_shares * price])
-df_holdings = pd.DataFrame(holdings, columns=['Stock', 'Price', 'Shares', 'On Hand'])
+    value = num_shares * price
+    pct_of_portfolio = value / portfolio_value * 100
+    holdings.append([stock, price, num_shares, value, pct_of_portfolio])
+df_holdings = pd.DataFrame(holdings, columns=['Stock', 'Price', 'Shares', 'On Hand', '% of Portfolio'])
 
 # Display the portfolio holdings in a table
 st.write(df_holdings)
