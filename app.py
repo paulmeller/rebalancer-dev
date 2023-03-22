@@ -7,6 +7,9 @@ def rebalance_portfolio(initial_weights, current_prices, target_weights, total_v
     initial_weights = np.array(initial_weights)
     target_weights = np.array(target_weights)
 
+    # Convert current prices to numpy array
+    current_prices = np.array(list(current_prices.values()))
+
     # Calculate the current value of each asset in the portfolio
     current_values = current_prices * (total_value * initial_weights)
 
