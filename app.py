@@ -69,7 +69,8 @@ current_portfolio_value = df_holdings['Value'].sum()
 df_weights = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Ticker')
 
 # Ask the user for their target allocation
-df_target_weights = display_editable_table(df_weights, 'Target Weights')
+# df_target_weights = display_editable_table(df_weights, 'Target Weights')
+df_target_weights = df_weights
 
 # Calculate the target portfolio value
 target_portfolio_value = current_portfolio_value * (df_target_weights['Weight'].sum() / df_weights['Weight'].sum())
