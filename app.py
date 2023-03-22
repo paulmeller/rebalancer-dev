@@ -52,11 +52,9 @@ current_portfolio = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': 
 current_holdings = []
 for stock in current_portfolio.index:
     price = 1 # proposed_prices[stock]
-    num_shares = 1 # proposed_shares[stock]
+    num_shares = current_portfolio.loc[stock, 'Shares']
     current_holdings.append([stock, price, num_shares, num_shares * price, current_portfolio.loc[stock, 'Shares']])
 df_current_holdings = pd.DataFrame(current_holdings, columns=['Stock', 'Price', 'Shares', 'Value', 'Number of Shares'])
-
-df_current_portfolio = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
 
 # df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
 df_holdings = df_current_holdings
