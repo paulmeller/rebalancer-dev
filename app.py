@@ -7,7 +7,7 @@ import plotly.express as px
 st.set_page_config(page_title='Portfolio Rebalancing Tool')
 
 st.title('Portfolio Rebalancing Tool')
-st.write('Enter a list of stock tickers and select the rebalancing frequency and allocation.')
+st.write('Enter a list of stock tickers and their corresponding weightings, and select the rebalancing frequency.')
 
 @st.cache_data
 def get_data(ticker, start_date, end_date):
@@ -15,12 +15,21 @@ def get_data(ticker, start_date, end_date):
     df['Ticker'] = ticker
     return df.reset_index().set_index(['Ticker', 'Date'])
 
-st.config.experimental_sidebar_unpinning=True
+def get_allocations(tickers_list, weights_list):
+    num_tickers = len(tickers_list)
+    allocations = pd.DataFrame({'Ticker': tickers_list, 'Weight': weights_list})
+    allocations['Allocation'] = allocations['Weight'] / allocations['Weight'].sum()
+    return allocations.set_index('Ticker')
 
-tickers = st.sidebar.text_input('Enter comma-separated list of stock tickers:')
+st.sidebar.set_option('deprecation.showPyplotGlobalUse', False)
+
+tickers_weights = st.sidebar.text_input('Enter comma-separated list of stock tickers and their corresponding weightings (e.g. AAPL:0.5,GOOG:0.3,MSFT:0.2):')
 if st.sidebar.button('Submit'):
-    tickers_list = tickers.upper().split(',')
+    tickers_weights_list = [tw.split(':') for tw in tickers_weights.upper().split(',') if tw.strip()]
+    tickers_list = [tw[0] for tw in tickers_weights_list]
+    weights_list = [float(tw[1]) for tw in tickers_weights_list]
     st.write('Tickers:', tickers_list)
+    st.write('Weights:', weights_list)
 
     start_date = '2020-01-01'
     end_date = '2023-03-22'
@@ -34,11 +43,8 @@ if st.sidebar.button('Submit'):
     # Rebalancing Frequency
     rebalance_freq = st.sidebar.selectbox('Rebalancing Frequency', ['Monthly', 'Quarterly', 'Yearly'])
 
-    # Allocation
-    weights = st.sidebar.text_input('Enter comma-separated list of weights (e.g. 0.5,0.3,0.2):')
-    weights_list = [float(w.strip()) for w in weights.split(',') if w.strip()]
-    if not weights_list or sum(weights_list) != 1.0:
-        st.error('Invalid weights input. Please enter a comma-separated list of weights that add up to 1.0.')
+    if sum(weights_list) != 1.0:
+        st.error('Invalid weights input. Please enter a comma-separated list of weightings that add up to 1.0.')
     else:
         allocations = get_allocations(tickers_list, weights_list)
         st.write('Allocations:', allocations)
