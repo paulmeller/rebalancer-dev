@@ -96,8 +96,7 @@ st.write(f"Proposed value: ${proposed_portfolio_value:,.2f}")
 # plot_allocation(df_proposed_holdings['Shares'].to_dict(), proposed_prices)
 
 # Display the proposed portfolio holdings in a table
-st.write("### Proposed Portfolio Holdings")
-df_proposed_holdings = display_editable_table(df_proposed_holdings, 'Current Portfolio')
+df_proposed_holdings = display_editable_table(df_proposed_holdings, 'Proposed Portfolio Holdings')
 
 # Compare the initial holdings with the proposed holdings to get the trade details
 trade_details = []
