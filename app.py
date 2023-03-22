@@ -49,6 +49,7 @@ try:
     target_portfolio_value = st.number_input('Enter the target value of your portfolio:', value=initial_portfolio_value, step=1000, min_value=0.0, max_value=float("inf"))
 except:
     st.warning("Unable to display the number input widget. Please input the target portfolio value as a number.")
+    target_portfolio_value = initial_portfolio_value
 # Rebalance the portfolio to match the target value
 portfolio_weights = df_weights.copy()
 proposed_portfolio, proposed_shares, proposed_prices = rebalance_portfolio(portfolio_weights, target_portfolio_value)
