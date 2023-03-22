@@ -15,7 +15,7 @@ def get_data(ticker, start_date, end_date):
     df['Ticker'] = ticker
     return df.reset_index().set_index(['Ticker', 'Date'])
 
-st.sidebar.set_option('deprecation.showPyplotGlobalUse', False)
+st.config.experimental_sidebar_unpinning=True
 
 tickers = st.sidebar.text_input('Enter comma-separated list of stock tickers:')
 if st.sidebar.button('Submit'):
