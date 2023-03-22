@@ -43,10 +43,9 @@ def display_editable_table(df, title):
 
 # Define a function to plot the portfolio allocation
 def plot_allocation(portfolio, prices):
-    # portfolio_values = {stock: (prices[stock] * (weight for stock, weight in portfolio.items()))}
-    # fig = px.pie(names=list(portfolio.keys()), values=list(portfolio_values.values()))
-    # st.plotly_chart(fig)
-    test = 1
+    portfolio_values = {stock: (prices[stock] * (weight for stock, weight in portfolio.items()))}
+    fig = px.pie(names=list(portfolio.keys()), values=list(portfolio_values.values()))
+    st.plotly_chart(fig)
 
 # Display the table for the user to input initial holdings
 df_current_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
@@ -93,7 +92,7 @@ st.write(f"Current value: ${current_portfolio_value:,.2f}")
 plot_allocation(df_holdings['Shares'].to_dict(), prices)
 proposed_portfolio_value = df_proposed_holdings['Value'].sum()
 st.write(f"Proposed value: ${proposed_portfolio_value:,.2f}")
-plot_allocation(df_proposed_holdings['Shares'].to_dict(), proposed_prices)
+# plot_allocation(df_proposed_holdings['Shares'].to_dict(), proposed_prices)
 
 # Display the proposed portfolio holdings in a table
 st.write("### Proposed Portfolio Holdings")
