@@ -15,8 +15,10 @@ def get_data(ticker, start_date, end_date):
     df['Ticker'] = ticker
     return df.reset_index().set_index(['Ticker', 'Date'])
 
-tickers = st.text_input('Enter comma-separated list of stock tickers:')
-if st.button('Submit'):
+st.sidebar.set_option('deprecation.showPyplotGlobalUse', False)
+
+tickers = st.sidebar.text_input('Enter comma-separated list of stock tickers:')
+if st.sidebar.button('Submit'):
     tickers_list = tickers.upper().split(',')
     st.write('Tickers:', tickers_list)
 
