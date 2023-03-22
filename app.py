@@ -44,7 +44,7 @@ def display_editable_table(df, title):
 # Define a function to plot the portfolio allocation
 def plot_allocation(portfolio, prices):
     portfolio_values = {stock: prices[stock] * weight for stock, weight in portfolio.items()}
-    fig = px.pie(values=portfolio_values, names=list(portfolio.keys()), values=list(values.values()))
+    fig = px.pie(names=list(portfolio.keys()), values=list(values.values()))
     st.plotly_chart(fig)
 
 # Define the initial portfolio weights as a dataframe
