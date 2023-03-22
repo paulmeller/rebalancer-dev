@@ -34,22 +34,22 @@ st.set_page_config(page_title='Portfolio Rebalancer', page_icon=':moneybag:')
 # Define the sidebar
 st.sidebar.title('Portfolio Rebalancer')
 
+# Get user input for the initial weights of each asset in the portfolio
+st.sidebar.subheader('Initial Weights')
+initial_weights = {}
+for asset in initial_weights.keys():
+    initial_weights[asset] = st.sidebar.number_input(f'{asset} Weight', min_value=0.0, max_value=1.0, value=0.0, step=0.01)
+
 # Get user input for the current prices of each asset in the portfolio
 st.sidebar.subheader('Current Prices')
 prices = {}
 for asset in initial_weights.keys():
     prices[asset] = st.sidebar.number_input(f'{asset} Price', min_value=0.0)
 
-# Get user input for the initial weights of each asset in the portfolio
-st.sidebar.subheader('Initial Weights')
-initial_weights = {}
-for asset in prices.keys():
-    initial_weights[asset] = st.sidebar.number_input(f'{asset} Weight', min_value=0.0, max_value=1.0, value=0.0, step=0.01)
-
 # Get user input for the target weights of each asset in the portfolio
 st.sidebar.subheader('Target Weights')
 target_weights = {}
-for asset in prices.keys():
+for asset in initial_weights.keys():
     target_weights[asset] = st.sidebar.number_input(f'{asset} Weight', min_value=0.0, max_value=1.0, value=0.0, step=0.01)
 
 # Get user input for the total value of the portfolio
