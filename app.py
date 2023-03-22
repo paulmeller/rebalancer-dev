@@ -26,12 +26,22 @@ def rebalance_portfolio(portfolio, target_value):
 
 # Define the initial portfolio weights as a dataframe
 df = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
-weights = st.experimental_data_editor(df)
+
+# Define the initial portfolio holdings as a dataframe
+holdings_df = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Shares': [47, 18]}).set_index('Stock')
+prices = {}
+for stock in holdings_df.index:
+    ticker = yf.Ticker(stock)
+    prices[stock] = ticker.history(period='1d')['Close'][0]
+holdings_df['Price'] = holdings_df.index.map(prices)
+holdings_df['On Hand'] = holdings_df['Shares'] * holdings_df['Price']
+portfolio_value = holdings_df['On Hand'].sum()
 
 # Get user input for portfolio value
-portfolio_value = st.number_input('Enter the value of your portfolio:', value=100000, step=1000)
+portfolio_value = st.number_input('Enter the value of your portfolio:', value=portfolio_value, step=1000)
 
 # Rebalance the portfolio to the user-defined value
+weights = df.copy()
 portfolio, shares, prices = rebalance_portfolio(weights, portfolio_value)
 
 # Create a new dataframe with the portfolio holdings and current values
@@ -40,10 +50,9 @@ for stock in portfolio.index:
     ticker = yf.Ticker(stock)
     price = prices[stock]
     num_shares = shares[stock]
-    value = num_shares * price
-    pct_of_portfolio = value / portfolio_value * 100
-    holdings.append([stock, price, num_shares, value, pct_of_portfolio])
-df_holdings = pd.DataFrame(holdings, columns=['Stock', 'Price', 'Shares', 'On Hand', '% of Portfolio'])
+    holdings.append([stock, price, num_shares, num_shares * price])
+df_holdings = pd.DataFrame(holdings, columns=['Stock', 'Price', 'Shares', 'On Hand'])
+df_holdings['Weight'] = df_holdings['On Hand'] / portfolio_value
 
 # Display the portfolio holdings in a table
 st.write(df_holdings)
