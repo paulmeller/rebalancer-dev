@@ -51,7 +51,7 @@ def plot_allocation(portfolio, prices):
 df_weights = pd.DataFrame({'Stock': ['AAPL', 'MSFT', 'GOOG'], 'Weight': [0.3, 0.5, 0.2]}).set_index('Stock')
 
 # Display the table for the user to input initial holdings
-df_current_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Stock')
+df_current_holdings = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
 try:
     df_holdings = display_editable_table(df_current_holdings)
 except:
