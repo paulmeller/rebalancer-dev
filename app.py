@@ -58,3 +58,25 @@ df_holdings['Weight'] = df_holdings['On Hand'] / portfolio_value
 
 # Display the portfolio holdings in a table
 st.write(df_holdings)
+
+# Compare the initial holdings with the new holdings to get the trade details
+trade_details = []
+for stock in holdings_df.index:
+    if stock in df_holdings['Stock'].values:
+        initial_shares = holdings_df.loc[stock, 'Shares']
+        new_shares = df_holdings.loc[df_holdings['Stock'] == stock, 'Shares'].values[0]
+        trade_shares = new_shares - initial_shares
+        if trade_shares > 0:
+            trade_details.append(f"Buy {trade_shares} shares of {stock}")
+        elif trade_shares < 0:
+            trade_details.append(f"Sell {-trade_shares} shares of {stock}")
+    else:
+        trade_details.append(f"Sell all shares of {stock}")
+for stock in df_holdings['Stock'].values:
+    if stock not in holdings_df.index:
+        trade_details.append(f"Buy all shares of {stock}")
+
+# Display the trade details
+st.write("Trade Details:")
+for trade in trade_details:
+    st.write(trade)
