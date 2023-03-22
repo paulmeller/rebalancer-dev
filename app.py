@@ -40,7 +40,7 @@ df_initial_holdings = pd.DataFrame({'ticker': ['GOOG', 'STIP'], 'Shares': [12, 2
 
 # Get the current stock prices from Yahoo Finance
 prices = {}
-for stock in initial_holdings.index:
+for stock in df_initial_holdings.index:
     ticker = yf.Ticker(stock)
     prices[stock] = ticker.history(period='1d')['Close'][0]
 # Calculate the current value of the portfolio based on the initial holdings
