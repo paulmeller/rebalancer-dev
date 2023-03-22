@@ -37,12 +37,11 @@ portfolio, shares, prices = rebalance_portfolio(weights, portfolio_value)
 # Create a new dataframe with the portfolio holdings and current values
 holdings = []
 for stock in portfolio.index:
-    weight = portfolio.loc[stock, 'Weight']
     ticker = yf.Ticker(stock)
     price = prices[stock]
     num_shares = shares[stock]
-    holdings.append([stock, weight, price, num_shares, num_shares * price])
-df_holdings = pd.DataFrame(holdings, columns=['Stock', 'Weight', 'Price', 'Shares', 'On Hand'])
+    holdings.append([stock, price, num_shares, num_shares * price])
+df_holdings = pd.DataFrame(holdings, columns=['Stock', 'Price', 'Shares', 'On Hand'])
 
 # Display the portfolio holdings in a table
 st.write(df_holdings)
