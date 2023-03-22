@@ -50,12 +50,11 @@ df_initial_holdings['On Hand'] = df_initial_holdings['Shares'] * df_initial_hold
 
 initial_holdings = st.experimental_data_editor(df_initial_holdings)
 
-
 # Get the target portfolio value
 target_portfolio_value = initial_holdings['On Hand'].sum()
 
 # Rebalance the portfolio to match the target value
-portfolio_weights = df_weights.copy()
+portfolio_weights = target_portfolio.copy()
 proposed_portfolio, proposed_shares, proposed_prices = rebalance_portfolio(portfolio_weights, target_portfolio_value)
 
 # Create a new dataframe with the proposed portfolio holdings and current values
