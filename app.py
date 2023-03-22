@@ -25,7 +25,8 @@ def rebalance_portfolio(portfolio, target_value):
     return portfolio, shares, prices
 
 # Define the initial portfolio weights as a dataframe
-weights = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
+df = pd.DataFrame({'Stock': ['GOOG', 'MSFT'], 'Weight': [0.6, 0.4]}).set_index('Stock')
+weights = st.experimental_data_editor(df)
 
 # Get user input for portfolio value
 portfolio_value = st.number_input('Enter the value of your portfolio:', value=100000, step=1000)
