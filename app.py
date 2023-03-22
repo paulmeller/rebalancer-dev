@@ -34,9 +34,9 @@ if st.button('Submit'):
 
     # Allocation
     weights = st.sidebar.text_input('Enter comma-separated list of weights (e.g. 0.5,0.3,0.2):')
-    weights_list = [float(w.strip()) for w in weights.split(',')]
-    if sum(weights_list) != 1.0:
-        st.error('Weights must add up to 1.0.')
+    weights_list = [float(w.strip()) for w in weights.split(',') if w.strip()]
+    if not weights_list or sum(weights_list) != 1.0:
+        st.error('Invalid weights input. Please enter a comma-separated list of weights that add up to 1.0.')
     else:
         allocations = get_allocations(tickers_list, weights_list)
         st.write('Allocations:', allocations)
