@@ -51,21 +51,14 @@ def plot_allocation(portfolio, prices):
 current_portfolio = pd.DataFrame({'Ticker': ['AAPL', 'MSFT', 'GOOG'], 'Shares': [300, 500, 200]}).set_index('Ticker')
 current_holdings = []
 for stock in current_portfolio.index:
+    # Get the current stock prices from Yahoo Finance
     ticker = yf.Ticker(stock)
     price = ticker.history(period='1d')['Close'][0]
     num_shares = current_portfolio.loc[stock, 'Shares']
     current_holdings.append([stock, price, num_shares, num_shares * price, current_portfolio.loc[stock, 'Shares']])
 df_current_holdings = pd.DataFrame(current_holdings, columns=['Stock', 'Price', 'Shares', 'Value', 'Number of Shares'])
 
-# df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
-df_holdings = df_current_holdings
-st.write(df_current_holdings)
-
-# Get the current stock prices from Yahoo Finance
-prices = {}
-for stock in df_holdings.index:
-    test = 1 # ticker = yf.Ticker(stock)
-    # prices[stock] = ticker.history(period='1d')['Close'][0]
+df_holdings = display_editable_table(df_current_holdings, 'Target Portfolio')
 
 # Calculate the current value of the portfolio based on the initial holdings
 df_holdings['Price'] = df_holdings.index.map(prices)
