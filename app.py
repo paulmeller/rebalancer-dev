@@ -1,72 +1,66 @@
 import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+from mortgagecalc import FixedMortgage
 
-# Define the tax brackets and rates for 2020
-tax_brackets = [
-    {'min_income': 0, 'max_income': 9875, 'rate': 0.10},
-    {'min_income': 9876, 'max_income': 40125, 'rate': 0.12},
-    {'min_income': 40126, 'max_income': 85525, 'rate': 0.22},
-    {'min_income': 85526, 'max_income': 163300, 'rate': 0.24},
-    {'min_income': 163301, 'max_income': 207350, 'rate': 0.32},
-    {'min_income': 207351, 'max_income': 518400, 'rate': 0.35},
-    {'min_income': 518401, 'max_income': float('inf'), 'rate': 0.37}
-]
+# Set page title and favicon
+st.set_page_config(page_title="Mortgage Calculator", page_icon=":money_with_wings:")
 
-# Define the standard deduction and personal exemption amounts for 2020
-standard_deduction = 12400
-personal_exemption = 0
+# Define function to calculate mortgage payments and generate amortization schedule
+def calculate_mortgage(loan_amount, interest_rate, loan_term, down_payment, frequency):
+    principal = loan_amount - down_payment
+    mortgage = FixedMortgage(principal, interest_rate, loan_term)
+    if frequency == 'Monthly':
+        payment = mortgage.monthly_payment()
+        schedule = mortgage.amortization_schedule()
+    elif frequency == 'Bi-Weekly':
+        payment = mortgage.biweekly_payment()
+        schedule = mortgage.biweekly_amortization_schedule()
+    elif frequency == 'Weekly':
+        payment = mortgage.weekly_payment()
+        schedule = mortgage.weekly_amortization_schedule()
+    return payment, schedule
 
-# Define the additional standard deduction amounts for certain taxpayers
-additional_standard_deduction = {
-    'single': 0,
-    'married': 1300,
-    'married_separate': 1300,
-    'head_of_household': 1600
-}
-
-# Define the tax credit amounts for 2020
-tax_credits = {
-    'child_tax_credit': 2000,
-    'earned_income_credit': 0
-}
-
-# Define the Streamlit app
+# Define Streamlit app
 def app():
-    st.title("2020 US Tax Return Estimator")
-
-    # Get user input for income and filing status
-    income = st.number_input("Enter your income for 2020:")
-    filing_status = st.selectbox(
-        "Select your filing status:",
-        ["Single", "Married Filing Jointly", "Married Filing Separately", "Head of Household"]
-    ).lower().replace(" ", "_")
-
-    # Calculate the taxable income
-    taxable_income = income - standard_deduction - additional_standard_deduction[filing_status] - personal_exemption
-    if taxable_income < 0:
-        taxable_income = 0
-
-    # Calculate the income tax
-    income_tax = 0
-    for bracket in tax_brackets:
-        if taxable_income > bracket['max_income']:
-            income_tax += (bracket['max_income'] - bracket['min_income'] + 1) * bracket['rate']
-        elif taxable_income > bracket['min_income']:
-            income_tax += (taxable_income - bracket['min_income'] + 1) * bracket['rate']
-            break
-
-    # Calculate the total tax
-    total_tax = income_tax
-
-    # Calculate the tax due or refund
-    withholding = st.number_input("Enter the total federal tax withholding for 2020:")
-    estimated_tax_payments = st.number_input("Enter the total estimated tax payments for 2020:")
-    refundable_credits = st.number_input("Enter the total refundable tax credits for 2020:")
-    nonrefundable_credits = st.number_input("Enter the total non-refundable tax credits for 2020:")
-    total_payments_and_credits = withholding + estimated_tax_payments + refundable_credits + nonrefundable_credits
-    tax_due_or_refund = total_payments_and_credits - total_tax
-
-    # Display the tax return estimate
-    st.header("Tax Return Estimate")
-    st.write(f"Taxable Income: ${taxable_income:,.2f}")
-
-app()
+    # Set app title and subtitle
+    st.title("Mortgage Calculator")
+    st.write("Calculate your monthly mortgage payments and generate an amortization schedule.")
+    
+    # Set up input fields
+    loan_amount = st.number_input("Loan Amount ($)", min_value=0.0, format="%f")
+    interest_rate = st.number_input("Interest Rate (%)", min_value=0.0, format="%f", step=0.01)
+    loan_term = st.number_input("Loan Term (years)", min_value=1, format="%d")
+    down_payment = st.number_input("Down Payment ($)", min_value=0.0, format="%f")
+    frequency = st.selectbox("Payment Frequency", ["Monthly", "Bi-Weekly", "Weekly"])
+    
+    # Calculate mortgage payment and display results
+    if st.button("Calculate"):
+        payment, schedule = calculate_mortgage(loan_amount, interest_rate, loan_term, down_payment, frequency)
+        st.write("Monthly Payment: $", "{:.2f}".format(payment))
+        st.write("Total Interest Paid: $", "{:.2f}".format(schedule['interest'].sum()))
+        
+        # Display amortization schedule
+        st.write("Amortization Schedule:")
+        st.write(schedule)
+        
+        # Create plot of payment schedule
+        payment_df = pd.DataFrame({'Payment': schedule['payment'], 'Principal': schedule['principal'], 'Interest': schedule['interest'], 'Balance': schedule['balance'], 'Month': schedule['month']})
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=payment_df['Month'], y=payment_df['Principal'], name='Principal'))
+        fig.add_trace(go.Scatter(x=payment_df['Month'], y=payment_df['Interest'], name='Interest'))
+        fig.add_trace(go.Scatter(x=payment_df['Month'], y=payment_df['Payment'], name='Payment'))
+        fig.add_trace(go.Scatter(x=payment_df['Month'], y=payment_df['Balance'], name='Balance'))
+        fig.update_layout(title='Payment Schedule', xaxis_title='Month', yaxis_title='Dollars')
+        st.plotly_chart(fig)
+        
+        # Create plot of interest vs. principal payments
+        interest_df = pd.DataFrame({'Interest': schedule['interest'], 'Principal': schedule['principal']})
+        fig = px.scatter(interest_df, x='Interest', y='Principal')
+        fig.update_layout(title='Interest vs. Principal Payments', xaxis_title='Interest', yaxis_title='Principal')
+       
+# Run Streamlit app
+if __name__ == '__main__':
+    app()
