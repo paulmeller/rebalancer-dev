@@ -5,7 +5,7 @@ import pandas as pd
 # Define function to get stock data and calculate trades
 def rebalance_portfolio(portfolio):
     # Get stock data from yfinance
-    data = yf.download(portfolio.keys())
+    data = yf.download(portfolio.keys().tolist())
     # Calculate current portfolio value
     current_value = (data['Adj Close'] * portfolio.values()).sum()
     # Calculate target portfolio value
