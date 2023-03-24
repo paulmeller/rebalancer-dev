@@ -2,47 +2,54 @@ import yfinance as yf
 import pandas as pd
 import streamlit as st
 
+# Initialize session-based array to store tickers and weights
+session_state = st.session_state
+if "portfolio_data" not in session_state:
+    session_state.portfolio_data = []
+
 # Create a form for user input
 st.header("Portfolio Rebalancing Tool")
 st.subheader("Enter your current portfolio and target weights for each holding:")
 
 # Create input fields for ticker symbols and current/target weights
-tickers = st.text_input("Enter ticker symbols separated by commas (e.g. AAPL,MSFT,AMZN)", value="AAPL,MSFT,AMZN")
-current_weights = st.text_input("Enter current weights as a percentage (e.g. 30,40,30)", value="30,40,30")
-target_weights = st.text_input("Enter target weights as a percentage (e.g. 33.33,33.33,33.33)", value="33.33,33.33,33.33")
+ticker = st.text_input("Enter ticker symbol")
+current_weight = st.number_input("Enter current weight as a percentage (e.g. 30)", min_value=0, max_value=100, value=0)
+target_weight = st.number_input("Enter target weight as a percentage (e.g. 33.33)", min_value=0, max_value=100, value=0)
 
-# Convert user input to pandas DataFrame
-try:
-    tickers_list = tickers.split(",")
-    current_weights_list = [float(x)/100 for x in current_weights.split(",")]
-    target_weights_list = [float(x)/100 for x in target_weights.split(",")]
-    data = {"Ticker": tickers_list, "Current Weight": current_weights_list, "Target Weight": target_weights_list}
-    df = pd.DataFrame(data)
-except:
-    st.error("Error: Please enter valid inputs.")
-    st.stop()
+# Add stock to session-based array when user clicks the "Add Stock" button
+if st.button("Add Stock"):
+    if ticker != "" and current_weight > 0 and target_weight > 0:
+        session_state.portfolio_data.append({"Ticker": ticker.upper(), "Current Weight": current_weight/100, "Target Weight": target_weight/100})
+    else:
+        st.warning("Please enter valid inputs for all fields.")
 
-# Use yfinance to get pricing data for each holding
-try:
-    prices = []
-    for ticker in tickers_list:
-        prices.append(yf.Ticker(ticker).info["regularMarketPrice"])
-    df["Price"] = prices
-except:
-    st.error("Error: Failed to retrieve pricing data for one or more tickers.")
-    st.stop()
+# Convert session-based array to pandas DataFrame
+if len(session_state.portfolio_data) > 0:
+    df = pd.DataFrame(session_state.portfolio_data)
+    
+    # Use yfinance to get pricing data for each holding
+    try:
+        prices = []
+        for ticker in df["Ticker"]:
+            prices.append(yf.Ticker(ticker).info["regularMarketPrice"])
+        df["Price"] = prices
+    except:
+        st.error("Error: Failed to retrieve pricing data for one or more tickers.")
+        st.stop()
 
-# Calculate the trades required to rebalance the portfolio
-try:
-    total_value = sum([df["Current Weight"][i] * df["Price"][i] for i in range(len(df))])
-    target_value = sum([df["Target Weight"][i] * df["Price"][i] for i in range(len(df))])
-    df["Target Shares"] = [int(target_value*df["Target Weight"][i]/df["Price"][i]) for i in range(len(df))]
-    df["Trade Shares"] = df["Target Shares"] - [int(total_value*df["Current Weight"][i]/df["Price"][i]) for i in range(len(df))]
-    df["Trade Cost"] = df["Trade Shares"] * df["Price"]
-except:
-    st.error("Error: Failed to calculate trades required to rebalance portfolio.")
-    st.stop()
+    # Calculate the trades required to rebalance the portfolio
+    try:
+        total_value = sum([df["Current Weight"][i] * df["Price"][i] for i in range(len(df))])
+        target_value = sum([df["Target Weight"][i] * df["Price"][i] for i in range(len(df))])
+        df["Target Shares"] = [int(target_value*df["Target Weight"][i]/df["Price"][i]) for i in range(len(df))]
+        df["Trade Shares"] = df["Target Shares"] - [int(total_value*df["Current Weight"][i]/df["Price"][i]) for i in range(len(df))]
+        df["Trade Cost"] = df["Trade Shares"] * df["Price"]
+    except:
+        st.error("Error: Failed to calculate trades required to rebalance portfolio.")
+        st.stop()
 
-# Display the summary of trades
-st.subheader("Summary of Trades Required to Rebalance Portfolio")
-st.write(df[["Ticker", "Trade Shares", "Trade Cost"]])
+    # Display the summary of trades
+    st.subheader("Summary of Trades Required to Rebalance Portfolio")
+    st.write(df[["Ticker", "Trade Shares", "Trade Cost"]])
+else:
+    st.warning("Please enter at least one stock to begin.")    
