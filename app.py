@@ -20,11 +20,6 @@ def rebalance_portfolio(portfolio):
     summary = summary[summary['Shares'] != 0]
     return summary
 
-# Define function to display summary table
-def display_summary(summary):
-    st.write('## Summary of Trades')
-    st.write(summary)
-
 # Define main function
 def main():
     # Set page title
