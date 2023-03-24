@@ -68,3 +68,5 @@ def app():
     # Display the tax return estimate
     st.header("Tax Return Estimate")
     st.write(f"Taxable Income: ${taxable_income:,.2f}")
+
+app()
