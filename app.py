@@ -1,66 +1,70 @@
-import yfinance as yf
-import pandas as pd
 import streamlit as st
 
-# Initialize session-based array to store tickers and weights
-session_state = st.session_state
-if "portfolio_data" not in session_state:
-    session_state.portfolio_data = []
+# Define the tax brackets and rates for 2020
+tax_brackets = [
+    {'min_income': 0, 'max_income': 9875, 'rate': 0.10},
+    {'min_income': 9876, 'max_income': 40125, 'rate': 0.12},
+    {'min_income': 40126, 'max_income': 85525, 'rate': 0.22},
+    {'min_income': 85526, 'max_income': 163300, 'rate': 0.24},
+    {'min_income': 163301, 'max_income': 207350, 'rate': 0.32},
+    {'min_income': 207351, 'max_income': 518400, 'rate': 0.35},
+    {'min_income': 518401, 'max_income': float('inf'), 'rate': 0.37}
+]
 
-# Create a form for user input
-st.header("Portfolio Rebalancing Tool")
-st.subheader("Enter your current portfolio and target weights for each holding:")
+# Define the standard deduction and personal exemption amounts for 2020
+standard_deduction = 12400
+personal_exemption = 0
 
-# Create input fields for ticker symbols and current/target weights
-ticker = st.text_input("Enter ticker symbol")
-current_weight = st.number_input("Enter current weight as a percentage (e.g. 30)", min_value=0, max_value=100, value=0)
-target_weight = st.number_input("Enter target weight as a percentage (e.g. 33.33)", min_value=0, max_value=100, value=0)
+# Define the additional standard deduction amounts for certain taxpayers
+additional_standard_deduction = {
+    'single': 0,
+    'married': 1300,
+    'married_separate': 1300,
+    'head_of_household': 1600
+}
 
-# Add stock to session-based array when user clicks the "Add Stock" button
-if st.button("Add Stock"):
-    if ticker != "" and current_weight > 0 and target_weight > 0:
-        session_state.portfolio_data.append({"Ticker": ticker.upper(), "Current Weight": current_weight/100, "Target Weight": target_weight/100})
-    else:
-        st.warning("Please enter valid inputs for all fields.")
+# Define the tax credit amounts for 2020
+tax_credits = {
+    'child_tax_credit': 2000,
+    'earned_income_credit': 0
+}
 
-# Convert session-based array to pandas DataFrame
-if len(session_state.portfolio_data) > 0:
-    df = pd.DataFrame(session_state.portfolio_data)
-    
-    # Use yfinance to get pricing data for each holding
-    try:
-        prices = []
-        for ticker in df["Ticker"]:
-            prices.append(yf.Ticker(ticker).info["regularMarketPrice"])
-        df["Price"] = prices
-    except:
-        st.error("Error: Failed to retrieve pricing data for one or more tickers.")
-        st.stop()
+# Define the Streamlit app
+def app():
+    st.title("2020 US Tax Return Estimator")
 
-    # Calculate the trades required to rebalance the portfolio
-    try:
-        total_value = sum([df["Current Weight"][i] * df["Price"][i] for i in range(len(df))])
-        target_value = sum([df["Target Weight"][i] * df["Price"][i] for i in range(len(df))])
-        df["Target Shares"] = [int(target_value*df["Target Weight"][i]/df["Price"][i]) for i in range(len(df))]
-        df["Trade Shares"] = df["Target Shares"] - [int(total_value*df["Current Weight"][i]/df["Price"][i]) for i in range(len(df))]
-        df["Trade Cost"] = df["Trade Shares"] * df["Price"]
-    except:
-        st.error("Error: Failed to calculate trades required to rebalance portfolio.")
-        st.stop()
+    # Get user input for income and filing status
+    income = st.number_input("Enter your income for 2020:")
+    filing_status = st.selectbox(
+        "Select your filing status:",
+        ["Single", "Married Filing Jointly", "Married Filing Separately", "Head of Household"]
+    ).lower().replace(" ", "_")
 
-    # Display the summary of trades
-    st.subheader("Summary of Trades Required to Rebalance Portfolio")
-    st.write(df[["Ticker", "Trade Shares", "Trade Cost"]])
+    # Calculate the taxable income
+    taxable_income = income - standard_deduction - additional_standard_deduction[filing_status] - personal_exemption
+    if taxable_income < 0:
+        taxable_income = 0
 
-    # Display the DataFrame and allow the user to delete stocks from the session-based array
-    st.subheader("Portfolio Data")
-    delete_index = st.empty()
-    delete_index_values = delete_index.multiselect("Select stocks to remove from portfolio", df.index.tolist())
-    if delete_index_values:
-        session_state.portfolio_data = df.drop(delete_index_values).to_dict("records")
-        df = pd.DataFrame(session_state.portfolio_data)
-        st.experimental_rerun()
+    # Calculate the income tax
+    income_tax = 0
+    for bracket in tax_brackets:
+        if taxable_income > bracket['max_income']:
+            income_tax += (bracket['max_income'] - bracket['min_income'] + 1) * bracket['rate']
+        elif taxable_income > bracket['min_income']:
+            income_tax += (taxable_income - bracket['min_income'] + 1) * bracket['rate']
+            break
 
-    st.write(df)
-else:
-    st.warning("Please enter at least one stock to begin.")
+    # Calculate the total tax
+    total_tax = income_tax
+
+    # Calculate the tax due or refund
+    withholding = st.number_input("Enter the total federal tax withholding for 2020:")
+    estimated_tax_payments = st.number_input("Enter the total estimated tax payments for 2020:")
+    refundable_credits = st.number_input("Enter the total refundable tax credits for 2020:")
+    nonrefundable_credits = st.number_input("Enter the total non-refundable tax credits for 2020:")
+    total_payments_and_credits = withholding + estimated_tax_payments + refundable_credits + nonrefundable_credits
+    tax_due_or_refund = total_payments_and_credits - total_tax
+
+    # Display the tax return estimate
+    st.header("Tax Return Estimate")
+    st.write(f"Taxable Income: ${taxable_income:,.2f}")
