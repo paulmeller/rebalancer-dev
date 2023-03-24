@@ -51,5 +51,16 @@ if len(session_state.portfolio_data) > 0:
     # Display the summary of trades
     st.subheader("Summary of Trades Required to Rebalance Portfolio")
     st.write(df[["Ticker", "Trade Shares", "Trade Cost"]])
+
+    # Display the DataFrame and allow the user to delete stocks from the session-based array
+    st.subheader("Portfolio Data")
+    delete_index = st.empty()
+    delete_index_values = delete_index.multiselect("Select stocks to remove from portfolio", df.index.tolist())
+    if delete_index_values:
+        session_state.portfolio_data = df.drop(delete_index_values).to_dict("records")
+        df = pd.DataFrame(session_state.portfolio_data)
+        st.experimental_rerun()
+
+    st.write(df)
 else:
-    st.warning("Please enter at least one stock to begin.")    
+    st.warning("Please enter at least one stock to begin.")
