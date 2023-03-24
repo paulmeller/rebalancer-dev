@@ -1,5 +1,6 @@
 import yfinance as yf
 import streamlit as st
+import pandas as pd
 
 # Define function to get stock data and calculate trades
 def rebalance_portfolio(portfolio):
