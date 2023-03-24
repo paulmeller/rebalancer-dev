@@ -20,6 +20,7 @@ def rebalance_portfolio(portfolio):
     summary = summary[summary['Shares'] != 0]
     return summary
 
+
 # Define main function
 def main():
     # Set page title
