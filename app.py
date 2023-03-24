@@ -1,66 +1,56 @@
+# Import required libraries
 import streamlit as st
-import pandas as pd
 import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
-from mortgagecalc import FixedMortgage
+import matplotlib.pyplot as plt
 
-# Set page title and favicon
-st.set_page_config(page_title="Mortgage Calculator", page_icon=":money_with_wings:")
+# Function to calculate monthly mortgage payment
+def calculate_mortgage_payment(principal, annual_interest_rate, term_years):
+    monthly_interest_rate = annual_interest_rate / 12 / 100
+    num_payments = term_years * 12
+    monthly_payment = principal * (monthly_interest_rate * np.power(1 + monthly_interest_rate, num_payments)) / (np.power(1 + monthly_interest_rate, num_payments) - 1)
+    return monthly_payment
 
-# Define function to calculate mortgage payments and generate amortization schedule
-def calculate_mortgage(loan_amount, interest_rate, loan_term, down_payment, frequency):
-    principal = loan_amount - down_payment
-    mortgage = FixedMortgage(principal, interest_rate, loan_term)
-    if frequency == 'Monthly':
-        payment = mortgage.monthly_payment()
-        schedule = mortgage.amortization_schedule()
-    elif frequency == 'Bi-Weekly':
-        payment = mortgage.biweekly_payment()
-        schedule = mortgage.biweekly_amortization_schedule()
-    elif frequency == 'Weekly':
-        payment = mortgage.weekly_payment()
-        schedule = mortgage.weekly_amortization_schedule()
-    return payment, schedule
+# Function to generate mortgage payment breakdown pie chart
+def create_payment_breakdown_chart(principal, interest_rate, mortgage_term):
+    plt.figure(figsize=(6, 6))
+    labels = ['Principal', 'Interest']
+    sizes = [principal, (interest_rate * mortgage_term * principal / 100)]
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    plt.axis('equal')
+    plt.title('Mortgage Payment Breakdown')
+    return plt
 
-# Define Streamlit app
-def app():
-    # Set app title and subtitle
-    st.title("Mortgage Calculator")
-    st.write("Calculate your monthly mortgage payments and generate an amortization schedule.")
-    
-    # Set up input fields
-    loan_amount = st.number_input("Loan Amount ($)", min_value=0.0, format="%f")
-    interest_rate = st.number_input("Interest Rate (%)", min_value=0.0, format="%f", step=0.01)
-    loan_term = st.number_input("Loan Term (years)", min_value=1, format="%d")
-    down_payment = st.number_input("Down Payment ($)", min_value=0.0, format="%f")
-    frequency = st.selectbox("Payment Frequency", ["Monthly", "Bi-Weekly", "Weekly"])
-    
-    # Calculate mortgage payment and display results
-    if st.button("Calculate"):
-        payment, schedule = calculate_mortgage(loan_amount, interest_rate, loan_term, down_payment, frequency)
-        st.write("Monthly Payment: $", "{:.2f}".format(payment))
-        st.write("Total Interest Paid: $", "{:.2f}".format(schedule['interest'].sum()))
-        
-        # Display amortization schedule
-        st.write("Amortization Schedule:")
-        st.write(schedule)
-        
-        # Create plot of payment schedule
-        payment_df = pd.DataFrame({'Payment': schedule['payment'], 'Principal': schedule['principal'], 'Interest': schedule['interest'], 'Balance': schedule['balance'], 'Month': schedule['month']})
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(x=payment_df['Month'], y=payment_df['Principal'], name='Principal'))
-        fig.add_trace(go.Scatter(x=payment_df['Month'], y=payment_df['Interest'], name='Interest'))
-        fig.add_trace(go.Scatter(x=payment_df['Month'], y=payment_df['Payment'], name='Payment'))
-        fig.add_trace(go.Scatter(x=payment_df['Month'], y=payment_df['Balance'], name='Balance'))
-        fig.update_layout(title='Payment Schedule', xaxis_title='Month', yaxis_title='Dollars')
-        st.plotly_chart(fig)
-        
-        # Create plot of interest vs. principal payments
-        interest_df = pd.DataFrame({'Interest': schedule['interest'], 'Principal': schedule['principal']})
-        fig = px.scatter(interest_df, x='Interest', y='Principal')
-        fig.update_layout(title='Interest vs. Principal Payments', xaxis_title='Interest', yaxis_title='Principal')
-       
-# Run Streamlit app
-if __name__ == '__main__':
-    app()
+# Function to generate remaining balance bar chart
+def create_remaining_balance_chart(principal, interest_rate, mortgage_term):
+    num_years = np.arange(1, mortgage_term + 1)
+    remaining_balances = [principal * (1 - (np.power(1 + interest_rate / 100, i) - 1) / np.power(1 + interest_rate / 100, mortgage_term)) for i in num_years]
+
+    plt.figure(figsize=(10, 6))
+    plt.bar(num_years, remaining_balances)
+    plt.xlabel('Year')
+    plt.ylabel('Remaining Balance ($)')
+    plt.title('Remaining Mortgage Balance Over Time')
+    plt.xticks(num_years)
+    return plt
+
+# App title and description
+st.title("Mortgage Calculator")
+st.write("Estimate your monthly mortgage payment based on the loan amount, interest rate, and term.")
+
+# User inputs
+home_price = st.number_input("Home Price", value=250000, step=1000, format="%i")
+down_payment = st.number_input("Down Payment", value=50000, step=1000, format="%i")
+mortgage_term = st.slider("Mortgage Term (Years)", min_value=10, max_value=30, value=30, step=1)
+interest_rate = st.slider("Interest Rate (%)", min_value=0.0, max_value=10.0, value=3.5, step=0.1)
+
+# Calculate mortgage principal and monthly payment
+principal = home_price - down_payment
+monthly_payment = calculate_mortgage_payment(principal, interest_rate, mortgage_term)
+
+# Display the results
+st.write(f"Loan Amount: ${principal:,.2f}")
+st.write(f"Monthly Mortgage Payment: ${monthly_payment:,.2f}")
+
+# Create and display visualizations
+st.pyplot(create_payment_breakdown_chart(principal, interest_rate, mortgage_term))
+st.pyplot(create_remaining_balance_chart(principal, interest_rate, mortgage_term))
